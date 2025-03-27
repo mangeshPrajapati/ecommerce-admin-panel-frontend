@@ -5,7 +5,7 @@
     "ng": "ng",
     "dev": "set NODE_OPTIONS=--openssl-legacy-provider && ng serve",
     "start": "ng serve",
-    "build": "node --max_old_space_size=1024 ./node_modules/@angular/cli/bin/ng build --prod --output-path=dist/app-test",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider && ng build --prod --output-path=dist/app-test",
     "serve": "serve -s dist/app-test",
     "test": "ng test",
     "lint": "ng lint",
