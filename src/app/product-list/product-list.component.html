@@ -1,0 +1,132 @@
+<div class="container">
+    <header class="admin-header">
+        <h1><i class="fas fa-boxes"></i> Product Dashboard</h1>
+        <button class="add-product-btn" (click)="showUpdatePopup = true" [disabled]="isLoading">
+            <i class="fas fa-plus"></i>
+            <span *ngIf="!isLoading">Add Product</span>
+            <span *ngIf="isLoading && actionType === 'add'">Adding...</span>
+        </button>
+    </header>
+
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon" style="background-color: rgba(76, 201, 240, 0.1); color: #4cc9f0;">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ products.length }}</h3>
+                <p>Total Products</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div *ngIf="isLoading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">{{ loadingMessage }}</div>
+    </div>
+
+    <div class="product-grid">
+        <div *ngFor="let product of products" class="product-card">
+            <div class="product-image-container" (mouseenter)="hoveredProduct = product.id"
+                (mouseleave)="hoveredProduct = null">
+                <img [src]="product.images[0]" alt="Product Image" class="product-image"
+                    [class.image-zoom]="hoveredProduct === product.id">
+                <div class="product-badge" *ngIf="product.discount">
+                    <i class="fas fa-tag"></i> {{ product.discount }}% OFF
+                </div>
+                <div class="product-actions">
+                    <button (click)="editProduct(product); $event.stopPropagation()" class="edit-btn"
+                        [disabled]="isLoading">
+                        <i class="fas fa-edit"></i>
+                        <span
+                            *ngIf="isLoading && actionType === 'edit' && selectedProduct?.id === product.id">Editing...</span>
+                    </button>
+                    <button (click)="deleteProduct(product.id); $event.stopPropagation()" class="delete-btn"
+                        [disabled]="isLoading">
+                        <i class="fas fa-trash-alt"></i>
+                        <span
+                            *ngIf="isLoading && actionType === 'delete' && deletingProductId === product.id">Deleting...</span>
+                    </button>
+                </div>
+            </div>
+            <div class="product-details">
+                <h3 class="product-title">{{ product.name }}</h3>
+                <div class="price-container">
+                    <span class="current-price">${{ product.price }}</span>
+                    <span class="original-price" *ngIf="product.originalPrice">${{ product.originalPrice }}</span>
+                </div>
+                <div class="product-meta">
+                    <span><i class="fas fa-barcode"></i> {{ product.sku }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Product Modal -->
+    <div *ngIf="showUpdatePopup" class="modal-overlay" (click)="closeUpdatePopup()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> {{ selectedProduct ? 'Edit Product' : 'Add New Product' }}</h3>
+                <button class="close-btn" (click)="closeUpdatePopup()" [disabled]="isLoading">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form [formGroup]="productForm" (ngSubmit)="selectedProduct ? updateProduct() : addProduct()"
+                class="product-form">
+                <div class="form-group">
+                    <label><i class="fas fa-barcode"></i> SKU</label>
+                    <input formControlName="sku" placeholder="PROD-001" [disabled]="isLoading">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Name</label>
+                    <input formControlName="name" placeholder="Product Name" [disabled]="isLoading">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-dollar-sign"></i> Price</label>
+                    <input formControlName="price" type="number" step="0.01" placeholder="0.00" [disabled]="isLoading">
+                </div>
+
+                <div class="image-section" *ngIf="selectedProduct?.images?.length">
+                    <h4><i class="fas fa-images"></i> Current Images</h4>
+                    <div class="current-images">
+                        <div *ngFor="let image of selectedProduct.images" class="image-thumbnail">
+                            <img [src]="image" class="thumb">
+                            <button type="button" class="remove-image-btn" (click)="deleteImage(image)"
+                                title="Remove image" [disabled]="isLoading">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-cloud-upload-alt"></i> Upload Images</label>
+                    <div class="file-upload-area">
+                        <label for="file-upload" class="file-upload-label" [class.disabled]="isLoading">
+                            <i class="fas fa-file-image"></i>
+                            <span *ngIf="imageFiles.length === 0">Click to browse</span>
+                            <span *ngIf="imageFiles.length > 0">{{ imageFiles.length }} file(s) selected</span>
+                        </label>
+                        <input id="file-upload" type="file" multiple (change)="onImageChange($event)"
+                            [disabled]="isLoading">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="cancel-btn" (click)="closeUpdatePopup()" [disabled]="isLoading">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="submit-btn" [disabled]="isLoading">
+                        <i class="fas fa-save"></i>
+                        <span *ngIf="!isLoading">{{ selectedProduct ? 'Update' : 'Add' }} Product</span>
+                        <span *ngIf="isLoading">{{ selectedProduct ? 'Updating...' : 'Adding...' }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
