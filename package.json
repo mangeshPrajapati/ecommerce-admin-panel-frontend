@@ -5,7 +5,8 @@
     "ng": "ng",
     "dev": "set NODE_OPTIONS=--openssl-legacy-provider && ng serve",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "node --max_old_space_size=1024 ./node_modules/@angular/cli/bin/ng build --prod --output-path=dist/app-test",
+    "serve": "serve -s dist/app-test",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -22,6 +23,7 @@
     "@angular/platform-browser-dynamic": "~10.2.4",
     "@angular/router": "~10.2.4",
     "rxjs": "~6.6.0",
+    "serve": "^14.2.4",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"
   },
